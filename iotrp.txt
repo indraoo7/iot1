@@ -1,0 +1,52 @@
+Code:
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setmode(GPIO.BCM)
+
+GPIO.setup(12,GPIO.OUT)
+
+p=GPIO.PWM(12,50)
+
+p.start(7.5)
+
+try:
+        while True:
+                p.ChangeDutyCycle(12.5)
+                time.sleep(4)
+                p.ChangeDutyCycle(2.5)
+                time.sleep(4)
+except KeyboardInterrupt:
+        p.stop()		
+		
+Read.py
+#!/usr/bin/env python
+
+import RPi.GPIO as GPIO
+import SimpleMFRC522
+reader = SimpleMFRC522.SimpleMFRC522()
+try:
+        id, text = reader.read()
+        print(id)
+        print(text)
+finally:
+        GPIO.cleanup()
+	
+Write.py
+#!/usr/bin/env python
+
+import RPi.GPIO as GPIO
+import SimpleMFRC522
+reader = SimpleMFRC522.SimpleMFRC522()
+try:
+        text = raw_input('New data:')
+        print("Now place your tag to write")
+        reader.write(text)
+        print("Written")
+finally:
+        GPIO.cleanup()
+
+
+		
+		
+		

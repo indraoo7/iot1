@@ -1,0 +1,176 @@
+Code for Blynk App:
+#include <ESP8266WiFi.h>
+#define BLYNK_PRINT Serial
+#include <BlynkSimpleEsp8266.h>
+#include <Servo.h>
+Servo myservo;
+int servo_position = 0;
+char auth[] = "ee2d64a1ace94119a31d5d5ff3a79bc0";
+char ssid[] = "indra007";
+char pass[] = "indra007";
+
+#define ledPin D7
+#define pirPin D1
+int pirValue;
+
+void setup()
+{
+  Serial.begin(115200);
+  delay(10);
+  Blynk.begin(auth, ssid, pass);
+  pinMode(ledPin, OUTPUT);
+  pinMode(pirPin, INPUT);
+  digitalWrite(ledPin, LOW);
+  myservo.attach(D2);
+}
+
+void loop()
+{
+  getPirValue();
+  Blynk.run();
+}
+
+void getPirValue(void)
+{
+  pirValue = digitalRead(pirPin);
+  if (pirValue)
+  {
+    Serial.println("==> Motion detected");
+    Blynk.notify("T==> Motion detected");
+    digitalWrite(ledPin, pirValue);
+    for (servo_position = 0; servo_position <= 180; servo_position += 1)
+    {
+      myservo.write(servo_position);
+      delay(15);
+    }
+    }
+  }
+
+  
+  
+  
+  
+  
+  Code for Thingspeak:
+#include <DHT.h>  
+#include <ESP8266WiFi.h>
+
+String apiKey = "IUPB592RGAXFE6FG";     
+const char *ssid =  "indra007";     
+const char *pass =  "indra007";
+const char* server = "api.thingspeak.com";
+
+#define DHTPIN 0          
+DHT dht(DHTPIN, DHT11);
+WiFiClient client;
+
+void setup()
+{
+  Serial.begin(115200);
+  delay(10);
+  dht.begin();
+  Serial.println("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, pass);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+}
+
+void loop()
+{
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (isnan(h) || isnan(t))
+  {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  if (client.connect(server, 80))  
+  {
+    String postStr = apiKey;
+    postStr += "&field1=";
+    postStr += String(t);
+    postStr += "&field2=";
+    postStr += String(h);
+    postStr += "\r\n\r\n";
+    client.print("POST /update HTTP/1.1\n");
+    client.print("Host: api.thingspeak.com\n");
+    client.print("Connection: close\n");
+    client.print("X-THINGSPEAKAPIKEY: " + apiKey + "\n");
+    client.print("Content-Type: application/x-www-form-urlencoded\n");
+    client.print("Content-Length: ");
+    client.print(postStr.length());
+    client.print("\n\n");
+    client.print(postStr);
+
+    Serial.print("Temperature: ");
+    Serial.print(t);
+    Serial.print(" degrees Celcius, Humidity: ");
+    Serial.print(h);
+    Serial.println("%. Send to Thingspeak.");
+  }
+  client.stop();
+  Serial.println("Waiting...");
+  delay(10000);
+}
+
+
+
+
+
+
+
+
+Ai-Thinker Technology Co.,Ltd.
+
+
+ready
+AT
+
+
+OK
+AT+GMR
+
+AT version:0.40.0.0(Aug  8 2015 14:45:58)
+SDK version:1.3.0
+Ai-Thinker Technology Co.,Ltd.
+Build:1.3.0.2 Sep 11 2015 11:48:04
+OK
+AT+CWLAP
+
++CWLAP:(3,"solesurvivor",-63,"e4:46:da:bb:e0:47",1,16)
++CWLAP:(0,"AI-THINKER_813DDC",-54,"86:f3:eb:81:3d:dc",1,13)
++CWLAP:(0,"BIZZ TAMANNA",-89,"78:d3:8d:d5:3c:d0",1,11)
++CWLAP:(0,"BIZZ TAMANNA",-89,"78:d3:8d:ec:2c:aa",1,-14)
++CWLAP:(0,"BIZZ TAMANNA",-92,"78:d3:8d:d5:32:64",1,3)
++CWLAP:(3,"WiFi_I2IT",-92,"ec:58:ea:35:33:f8",1,10)
++CWLAP:(0,"BIZZ TAMANNA",-89,"78:d3:8d:d5:3d:84",6,3)
++CWLAP:(3,"Le Bhikari Le!",-58,"c0:ee:fb:55:ad:52",6,6)
++CWLAP:(0,"BIZZ TAMANNA",-91,"78:d3:8d:d5:3d:70",6,0)
++CWLAP:(0,"BIZZ TAMANNA",-90,"78:d3:8d:d5:32:08",6,6)
++CWLAP:(3,"indra007",-47,"e4:46:da:a3:cd:bf",11,16)
++CWLAP:(0,"BIZZ TAMANNA",-91,"78:d3:8d:d5:3d:5c",11,6)
++CWLAP:(3,"WiFi_I2IT",-83,"ec:58:ea:36:13:a8",11,3)
++CWLAP:(3,"WiFi_I2IT",-89,"ec:58:ea:36:16:08",11,6)
+
+OK
+AT+CWJAP="indra007","indra007"
+
+WIFI CONNECTED
+WIFI GOT IP
+
+OK
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,44 @@
+Code:
+#include <Servo.h>
+Servo myservo;
+int servo_position = 0;
+#define IR_Sensor1 12
+#define IR_Sensor2 11
+#define Relay_Pin 10
+int ir1_value;
+int ir2_value;
+
+void setup() 
+{
+  Serial.begin(9600);
+  myservo.attach(9);
+  pinMode(IR_Sensor1, INPUT);
+  pinMode(IR_Sensor2, INPUT);
+  pinMode(Relay_Pin, OUTPUT);
+}
+
+void loop()
+{
+  ir1_value = digitalRead(IR_Sensor1);
+  Serial.print("IR1 Value is - ");
+  Serial.println(ir1_value);
+  ir2_value = digitalRead(IR_Sensor2);
+  Serial.print("IR2 Value is - ");
+  Serial.println(ir2_value);
+  
+  if (ir1_value == 1)
+  {
+    for (servo_position = 0;servo_position <= 180;servo_position += 1) 
+    {
+      myservo.write(servo_position);
+      delay(15);
+    }
+  }
+if (ir2_value == 1)
+  {
+	Serial.println("Lights ON");
+    digitalWrite(Relay_Pin,HIGH);
+    delay(5000);
+  }
+}
+
